@@ -15,10 +15,10 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 //@Configuration
 public class MyBatisConfig {
 	
-//	@Autowired
-//	private ApplicationContext applicationContext;
+	@Autowired
+	private ApplicationContext applicationContext;
 	
-//	@Bean
+	@Bean
 	public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
 		SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
 		sessionFactoryBean.setDataSource(dataSource);
@@ -26,11 +26,12 @@ public class MyBatisConfig {
 		//sessionFactoryBean.setConfigLocation(applicationContext.getResource(""));
 		//sessionFactoryBean.setMapperLocations(applicationContext.getResources(""));
 		sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:persistence/*.xml"));
+		sessionFactoryBean.setConfiguration(configuration());
 		return sessionFactoryBean.getObject();
 		
 	}
 	
-//	@Bean
+	@Bean
 	public DataSourceTransactionManager transactionManager(DataSource dataSource) {
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
 		transactionManager.setDataSource(dataSource);
@@ -38,10 +39,16 @@ public class MyBatisConfig {
 		return transactionManager;
 	}
 	
-//	@Bean
+	@Bean
 	public MapperScannerConfigurer mapperScannerConfigurer() {
 		MapperScannerConfigurer configurer = new MapperScannerConfigurer();
-		configurer.setBasePackage("kr.co.springboot.persistence");
+		configurer.setBasePackage("kr.co.springboot.persistence.mybatis");
 		return configurer;
+	}
+	
+	public org.apache.ibatis.session.Configuration configuration() {
+		org.apache.ibatis.session.Configuration mybaatisConfiguration = new org.apache.ibatis.session.Configuration();
+		mybaatisConfiguration.setMapUnderscoreToCamelCase(true);
+		return mybaatisConfiguration;
 	}
 }

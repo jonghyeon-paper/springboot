@@ -1,4 +1,4 @@
-package kr.co.springboot.hibernate.model;
+package kr.co.springboot.model.hibernate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

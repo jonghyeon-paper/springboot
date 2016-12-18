@@ -1,19 +1,20 @@
-package kr.co.springboot.hibernate.model;
+package kr.co.springboot.model.hibernate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity(name = "USERS")
+@Entity(name = "MEMBER")
 public class User {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column
 	private String username;
 	
+	@Column
 	private String password;
 	
+	@Column
 	private boolean enabled;
 	
 //	@OneToMany(mappedBy = "")

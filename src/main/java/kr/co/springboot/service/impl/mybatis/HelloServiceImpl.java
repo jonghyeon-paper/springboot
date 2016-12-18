@@ -7,21 +7,22 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import kr.co.springboot.hibernate.model.User;
-import kr.co.springboot.persistence.HelloMapper;
+import kr.co.springboot.model.hibernate.User;
+import kr.co.springboot.persistence.mybatis.HelloMapper;
 import kr.co.springboot.service.HelloService;
 
 //@Service
 public class HelloServiceImpl implements HelloService {
 	
-//	@Autowired
-//	private HelloMapper helloMapper;
+	@Autowired
+	private HelloMapper helloMapper;
 	
 	@Override
 	public List<Map<String, Object>> getUserList() {
 		
 		List<Map<String, Object>> userList = new ArrayList<Map<String, Object>>();
-//		userList = helloMapper.selectUserList();
+		userList = helloMapper.selectUserList();
+		System.out.println("userList > " + userList.size());
 		for (Map<String, Object> user : userList) {
 			System.out.println(user.toString());
 		}

@@ -3,7 +3,7 @@ package kr.co.springboot.service;
 import java.util.List;
 import java.util.Map;
 
-import kr.co.springboot.hibernate.model.User;
+import kr.co.springboot.model.hibernate.User;
 
 public interface HelloService {
 

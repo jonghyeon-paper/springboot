@@ -1,4 +1,4 @@
-package kr.co.springboot.persistence;
+package kr.co.springboot.persistence.mybatis;
 
 import java.util.List;
 import java.util.Map;

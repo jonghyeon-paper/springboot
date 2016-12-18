@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import kr.co.springboot.hibernate.model.User;
+import kr.co.springboot.model.hibernate.User;
 import kr.co.springboot.service.HelloService;
 
 @Controller
@@ -27,12 +27,11 @@ public class HelloController {
 		return "greeting";
 	}
 	
+	@RequestMapping("/add")
 	public Map<String, Object> addUser(Model model,
 			@ModelAttribute User user) {
 		
-		//helloService.
-		
+		helloService.addUser(user);
 		return null;
-		
 	}
 }

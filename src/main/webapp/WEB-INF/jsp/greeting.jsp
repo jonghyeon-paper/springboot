@@ -9,6 +9,12 @@
 <body>
 	hello~~
 	<br>
+	<%-- 
+	<c:forEach var="item" items="${userList}" varStatus="status">
+		<c:out value="${item.USERNAME}"/> / <c:out value="${item.PASSWORD}"/> / <c:out value="${item.ENABLED}"/> <br>
+	</c:forEach>
+	--%>
+	<br>
 	<c:forEach var="item" items="${userList}" varStatus="status">
 		<c:out value="${item.username}"/> / <c:out value="${item.password}"/> / <c:out value="${item.enabled}"/> <br>
 	</c:forEach>
