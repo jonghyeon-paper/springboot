@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		var passedTime = 0;
+		var loginHandler = (function(){
+			var resultHandler = function(data) {
+				if (data.accessUrl) {
+					requestLoginAjax(data.accessUrl);
+				} else if (data.checkerUrl) {
+					window.setTimeout(function() {
+						hasUseableKey(data.checkerUrl);
+					}, 1000);
+				} else {
+					if (console && console.log) {
+						console.log('Unknown error occur.');
+					}
+				}
+			};
+			
+			var hasUseableKey = function(checkerUrl) {
+				jQuery.ajax(checkerUrl, {
+					type: 'GET',
+					dataType: 'json',
+					contentType: 'application/json; charset=utf-8',
+					success: resultHandler,
+					error: function() {
+						if (passedTime === 10) {
+							resultHandler({
+								accessUrl: 'http://localhost:8080'
+							});
+						} else {
+							$('#passedTime').html(++passedTime);
+							resultHandler({
+								checkerUrl: 'http://localhost:8080'
+							});
+						}
+					}
+				});
+			};
+			
+			var requestLoginAjax = function(requestUrl, params) {
+				jQuery.ajax(requestUrl, {
+					type: 'POST',
+					data: params,
+					dataType: 'json',
+					contentType: 'application/json; charset=utf-8',
+					success: resultHandler,
+					error: function() {
+						$('#message').html('complete!');
+					}
+				});
+			};
+			
+			return {
+				request: function() {
+					hasUseableKey('http://localhost:8080');
+				}
+			};
+		}());
+		
+		$(function(){
+			loginHandler.request('http://localhost:8080');
+		});
+	</script>
+</head>
+<body>
+	<div id="passedTime"></div>
+	<div id="message"></div>
+</body>
+</html>
