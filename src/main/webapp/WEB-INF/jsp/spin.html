@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>Insert title here</title>
+</head>
+<body>
+	<div style="width:100%">
+		<div style="float: left; width: 20%; height: 500px; background-color: red;">
+			<div id="left"></div>
+		</div>
+		<div style="float: left; width: 80%; height: 500px; background-color: yellow;">
+			<div id="right"></div>
+		</div>
+	</div>
+	<button type="button" id="on" onclick="on();">ON</button>
+	<button type="button" id="off" onclick="off();">OFF</button>
+	<script type="text/javascript" src="./spin.js"></script>
+	<script type="text/javascript">
+	var opts = {
+			  lines: 13 // The number of lines to draw
+			, length: 0 // The length of each line
+			, width: 14 // The line thickness
+			, radius: 42 // The radius of the inner circle
+			, scale: 0.5 // Scales overall size of the spinner
+			, corners: 1 // Corner roundness (0..1)
+			, color: '#000' // #rgb or #rrggbb or array of colors
+			, opacity: 0.25 // Opacity of the lines
+			, rotate: 0 // The rotation offset
+			, direction: 1 // 1: clockwise, -1: counterclockwise
+			, speed: 0.8 // Rounds per second
+			, trail: 60 // Afterglow percentage
+			, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+			, zIndex: 2e9 // The z-index (defaults to 2000000000)
+			, className: 'spinner' // The CSS class to assign to the spinner
+			, top: '50%' // Top position relative to parent
+			, left: '50%' // Left position relative to parent
+			, shadow: true // Whether to render a shadow
+			, hwaccel: false // Whether to use hardware acceleration
+			, position: 'absolute' // Element positioning
+		};
+	
+		var spinner = new Spinner(opts);
+
+		function on () {
+			var target = document.getElementById('right');
+			spinner.spin(target);
+		}
+		
+		function off () {
+			spinner.stop();
+		}
+	</script>
+</body>
+</html>
