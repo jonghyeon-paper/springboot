@@ -1,24 +1,26 @@
 function makeRealGridFieldAndColumn(gridView, fieldInfo){
 	var fields = [];
 	var columns = [];
+	var originalColumns = [];
 	
 	var fieldLength = fieldInfo.length;
 	for (var i = 0; i < fieldLength; i++) {
-		var fieldName     = fieldInfo[i].fieldName;
-		var fieldType     = fieldInfo[i].fieldType;
-		var editable      = fieldInfo[i].editable;
-		var type          = fieldInfo[i].type;
-		var visible       = fieldInfo[i].visible;
-		var width         = fieldInfo[i].width;
-		var text          = fieldInfo[i].text;
-		var status        = fieldInfo[i].status;
-		var subColumns    = fieldInfo[i].subColumns;
-		var align         = fieldInfo[i].align;
+		var fieldName	 = fieldInfo[i].fieldName;
+		var fieldType	 = fieldInfo[i].fieldType;
+		var editable	  = fieldInfo[i].editable;
+		var type		  = fieldInfo[i].type;
+		var visible	   = fieldInfo[i].visible;
+		var width		 = fieldInfo[i].width;
+		var text		  = fieldInfo[i].text;
+		var status		= fieldInfo[i].status;
+		var subColumns	= fieldInfo[i].subColumns;
+		var align		 = fieldInfo[i].align;
 		var dynamicStyles = fieldInfo[i].dynamicStyles;
 		var defaultValue  = fieldInfo[i].defaultValue;
 		
 		var field = {};
 		var column = {};
+		
 		// set field information
 		field = {
 				fieldName: fieldName,
@@ -54,13 +56,13 @@ function makeRealGridFieldAndColumn(gridView, fieldInfo){
 			if (type["element"] === "line") {
 				column['editor'] = {
 						type: 'line',
-						maxLength: (type['maxLength'] ? type['maxLength'] : 0),          // 최대입력길이. 0이면 무한.
-						textCase: (type['textCase'] ? type['textCase'] : 'default')      // 대소문자 변환. default가 기본값.
+						maxLength: (type['maxLength'] ? type['maxLength'] : 0),		  // 최대입력길이. 0이면 무한.
+						textCase: (type['textCase'] ? type['textCase'] : 'default')	  // 대소문자 변환. default가 기본값.
 				};
 			} else if (type["element"] === "number") {
 				column['editor'] = {
 						type: 'number',
-						positiveOnly: true    // 양수값만 가능.
+						positiveOnly: true	// 양수값만 가능.
 				};
 			} else if (type["element"] === "date") {
 				column['editor'] = {
@@ -70,8 +72,8 @@ function makeRealGridFieldAndColumn(gridView, fieldInfo){
 			} else if (type['element'] === "dropDown") {
 				column['editor'] = {
 						type: 'dropDown',
-						domainOnly: true,        // 목록에 있는 값들만 지정할 수 있게
-						textReadOnly: true,      // true이면 키보드로 입력이 안되고 선택만 가능하게 된다.
+						domainOnly: true,		// 목록에 있는 값들만 지정할 수 있게
+						textReadOnly: true,	  // true이면 키보드로 입력이 안되고 선택만 가능하게 된다.
 						dropDownWhenClick: true,
 				};
 				column['labels'] = [type["labels"]];
@@ -166,6 +168,7 @@ function makeRealGridFieldAndColumn(gridView, fieldInfo){
 		} else {
 			// type이 없는경우
 			column['type'] = 'data';
+			
 			// 배경색 지정
 			if (status === 'required') {
 				column['styles'] = {
@@ -226,14 +229,20 @@ function makeRealGridFieldAndColumn(gridView, fieldInfo){
 		if (subColumns) {
 			// 그룹컬럼인 경우 자식그룹에서 필드정보를 가져온다.
 			var subGroupFields = subGroupInfo['fields']
-			var subGroupLength = subGroupFields.length;
-			for (var k = 0; k < subGroupLength; k++) {
+			for (var k = 0; k < subGroupFields.length; k++) {
 				fields.push(subGroupFields[k]);
 			}
+			
+			var subGroupOriginalColumns = subGroupInfo['originalColumns'];
+			for (var k = 0; k < subGroupOriginalColumns.length; k++) {
+				originalColumns.push(subGroupOriginalColumns[k]);
+			}
+			
 			columns.push(column);
 		} else {
 			fields.push(field);
 			columns.push(column);
+			originalColumns.push(column);
 		}
 	} // end for
 	
@@ -241,6 +250,110 @@ function makeRealGridFieldAndColumn(gridView, fieldInfo){
 	return {
 		fields:  fields,
 		columns: columns,
+		originalColumns: originalColumns,
 		gridView: gridView
 	};
+}
+
+function isValid(gridId, dataList, fieldInfo, callback) {
+	var grid = $("#"+gridId).data("grid");
+	var fieldInfoList = makeRealGridFieldAndColumn(grid, fieldInfo)['fieldInformations'];
+	
+	var targetDataList = []; 
+	for(var i = 0; i < dataList.length; i++) {
+		if(dataList[i].state === "created" || dataList[i].state === "updated") {
+			targetDataList.push(dataList[i]);
+		}
+	}
+	if(targetDataList.length < 1) {
+		return true;
+	}
+	
+	var targetFieldMap = {};
+	for (var index in fieldInfoList) {
+		var item = fieldInfoList[index];
+		
+		if (item["validation"]) {
+			var fieldName = item.fieldName;
+			var fieldValidationList = item.validation.length ? item.validation : [item.validation];
+			var fieldValidationArray = [];
+			
+			for(var fieldValidationIndex in fieldValidationList) {
+				var fieldValidationInfo = fieldValidationList[fieldValidationIndex];
+				
+				fieldValidationArray.push({
+					checkType: fieldValidationInfo.type,
+					regExp: nextbi.common.utils.nvl(fieldValidationInfo.regExp, ""),
+					falseMessage: fieldValidationInfo.message,
+					columnText : item.text
+				});
+			}
+			targetFieldMap[fieldName] = fieldValidationArray;
+		}
+	}
+	
+	for(var index in targetDataList) {
+		var dataItem = targetDataList[index];
+		
+		for(var key in targetFieldMap) {
+			var targetDataField = key;
+			var targetDataValue = dataItem[key];
+			var fieldValidationArray = targetFieldMap[key];
+			
+			for(var fieldValidationIndex in fieldValidationArray) {
+				var fieldValidationInfo = fieldValidationArray[fieldValidationIndex];
+				var checkType = fieldValidationInfo.checkType;
+				var flag = false;
+				
+				var  defaultMessage = "";
+				switch (checkType) {
+				case "required":
+					flag = (targetDataValue === null || targetDataValue === undefined || targetDataValue === "") ? true : false;
+					defaultMessage = messageSource["common.grid.message.validation.required"];
+					break;
+				case "number":
+					var regExp = /\D/g;
+					flag = regExp.test(targetDataValue);
+					defaultMessage = messageSource["common.grid.message.validation.number"];
+					break;
+				case "string":
+					var regExp = /[^a-zA-Z]/;
+					flag = regExp.test(targetDataValue);
+					defaultMessage = messageSource["common.grid.message.validation.string"];
+					break;
+				case "upperCase":
+					var regExp = /[^A-Z]/;
+					flag = regExp.test(targetDataValue);
+					defaultMessage = messageSource["common.grid.message.validation.upperCase"];
+					break;
+				case "lowerCase":
+					var regExp = /[^a-z]/;
+					flag = regExp.test(targetDataValue);
+					defaultMessage = messageSource["common.grid.message.validation.lowerCase"];
+					break;
+				case "notKor":
+					var regExp = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+					flag = regExp.test(targetDataValue);
+					defaultMessage = messageSource["common.grid.message.validation.notKor"];
+					break;							
+				case "regExp":
+					var regExp = new RegExp(fieldValidationInfo.regExp);
+					flag = !regExp.test(targetDataValue);
+					break;
+				default: 
+					break;
+				}
+				
+				if(flag) {
+					var message = fieldValidationInfo.falseMessage;
+					if(!message) {
+						message = fieldValidationInfo.columnText + defaultMessage;
+					}
+					nextbi.common.component.errorMsg(message);
+					return false;
+				}
+			}
+		}
+	}
+	return true;
 }
