@@ -142,6 +142,8 @@ function makeRealGridFieldAndColumn(gridView, fieldInfo){
 					column['styles'] = {
 							background: '#f6f6f6'
 					};
+				} else {
+					column['styles'] = {};
 				}
 				
 				// 정렬 지정
@@ -178,6 +180,8 @@ function makeRealGridFieldAndColumn(gridView, fieldInfo){
 				column['styles'] = {
 						background: '#f6f6f6'
 				};
+			} else {
+				column['styles'] = {};
 			}
 			
 			// 정렬 지정
