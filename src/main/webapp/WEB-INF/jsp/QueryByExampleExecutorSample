@@ -1,0 +1,19 @@
+        /* sample extends QueryByExampleExecutor<T>
+
+        if (StringUtils.isBlank(formula.getCompanyCode())) {
+            formula.setCompanyCode(null);
+        }
+        if (StringUtils.isBlank(formula.getIndividualConsolidation())) {
+            formula.setIndividualConsolidation(null);
+        }
+        if (StringUtils.isBlank(formula.getAccount())) {
+            formula.setAccount(null);
+        }
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreNullValues();
+
+        Example<Formula> example = Example.of(formula, matcher);
+
+        return (List<Formula>) this.formulaRepository.findAll(example);
+        */
